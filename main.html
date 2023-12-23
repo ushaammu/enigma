@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Home page</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="" />
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="https://ops1.vnaya.com/en/public/home/vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="https://ops1.vnaya.com/en/public/home/fonts/iconic/css/material-design-iconic-font.min.css">
+
+
+	<link rel="stylesheet" type="text/css" href="https://ops1.vnaya.com/en/public/home/css/util.css">
+	<link rel="stylesheet" type="text/css" href="https://ops1.vnaya.com/en/public/home/css/main.css">
+  
+</head>
+
+<body>
+<!--mainbanner section-->
+<img data-toggle="modal" data-target="#site_offers" class="gif_banner_friday" src="https://ops1.vnaya.com/assets/images/RedFestiveSurpriseGiftBox.gif"/>
+	<div class="limiter">
+		<div class="container-login100" style="background-image: url(https://ops1.vnaya.com/en/public/home/images/bgc.jpg);">
+			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
+				<form class="login100-form validate-form">
+					<span class="login100-form-title p-b-19">
+						<img class="card-logo" src="https://ops1.vnaya.com/en/assets/images/maroon-vnayalogo2.png"/>
+					</span>
+
+					<div class="text-right p-t-8 p-b-31"></div>
+
+					<div class="container-login100-form-btn">
+						<div class="wrap-login100-form-btn mb-4">
+							<div class="login100-form-bgbtn"></div>
+                <a href="https://ops1.vnaya.com/Ops/login" class="login100-form-btn">
+                  Login as a Tutor
+                </a>
+						</div>
+            <div class="wrap-login100-form-btn mb-4">
+							<div class="login100-form-bgbtn"></div>
+                <a href="https://ops1.vnaya.com/en/login" class="login100-form-btn">
+                  Login as a Student
+                </a>
+						</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<style>
+	canvas {
+  height: 100%;
+  left: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+    .gif_banner_friday{
+      position: fixed;
+      right: 0px;
+      top: 20%;
+      width: 150px;
+      height: 150px;
+      z-index: 99999;
+      border-top-left-radius: 9px;
+      border-bottom-left-radius: 75px;
+     // display: none;
+    }
+</style>
+	<main></main>
+	<script>
+// Happy Holidays (2018)!
+
+// Tweak this integer. The lower it is, more snow you'll create:
+let throttle = 5;
+
+function rndIntBtwn(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function rndFloatBtwn(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+class Snowfall {
+
+  constructor(element) {
+    let canvas = document.createElement('canvas');
+
+    this.ctx = canvas.getContext('2d');
+    this.counter = 0;
+    this.particles = [];
+    this.running = true;
+    this.width = this.ctx.canvas.width;
+    this.height = this.ctx.canvas.height;
+    this.maxDiameter = 7;
+    this.startY = -this.maxDiameter * 0.5;
+    this.endY = this.height + this.maxDiameter * 0.5;
+    this.showPaths = false;
+
+    element.appendChild(canvas);
+
+    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('click', this.handleClick.bind(this));
+
+    this.handleResize();
+  }
+
+  addParticle() {
+    let x = rndIntBtwn(0, this.width);
+    let y = this.startY;
+    let diameter = rndIntBtwn(1, this.maxDiameter);
+    // let color = `rgb(${rndFloatBtwn(0, 255)}, ${rndFloatBtwn(0, 255)}, ${rndFloatBtwn(0, 255)})`;
+    let color = `rgba(255, 255, 255, ${rndFloatBtwn(0.8, 1)})`;
+    let particle = new Particle(this.ctx, x, y, diameter, color);
+    this.particles.push(particle);
+  }
+
+  handleClick(e) {
+    let btn = e.target.closest('button');
+    if (btn) {
+      if (this.running) {
+        this.running = false;
+        btn.textContent = 'play';
+      } else {
+        this.running = true;
+        btn.textContent = 'pause';
+      }
+      this.render();
+    }
+  }
+
+  handleResize() {
+    this.ctx.canvas.width = this.width = window.innerWidth;
+    this.ctx.canvas.height = this.height = window.innerHeight;
+    this.endY = this.height + this.maxDiameter * 0.5;
+  }
+
+  render(time) {
+    if (this.running) {
+      // delta will be undefined on first run, so I'm setting it to zero, below. This wouldn't really make a difference, but the play/pause button would reset the animation on click of "play" if an undefined value were added to the mix.
+      let delta = time ? time : 0;
+
+      // throttle the amount of particles being added:
+      if (this.counter > throttle) {
+        this.addParticle();
+        this.counter = 0;
+      }
+      if (!this.showPaths) {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+      }
+      this.particles.forEach(p => {
+        p.x += Math.sin(delta * p.freqFactor) * p.ampFactor;
+        p.y += p.speed;
+        p.draw();
+      });
+      // remove particles that are beyond the vertical bounds of the canvas:
+      this.particles = this.particles.filter(p => p.y <= this.height);
+      this.counter++;
+      window.requestAnimationFrame(this.render.bind(this));
+    }
+  }}
+
+
+
+class Particle {
+
+  constructor(context, x, y, diameter, color, speed) {
+    this.color = color;
+    this.ctx = context;
+    this.glow = rndIntBtwn(2, 10);
+    this.radius = diameter * 0.5;
+    this.x = x;
+    this.y = y;
+    this.speed = diameter * 0.1; // smaller particles will be slower
+    this.freqFactor = rndFloatBtwn(5, 9) * .0001;
+    this.ampFactor = rndFloatBtwn(2, 5) * .1;
+  }
+
+  draw() {
+    this.ctx.shadowBlur = this.glow;
+    this.ctx.shadowOffset = 0;
+    this.ctx.shadowColor = this.color;
+    this.ctx.fillStyle = this.color;
+    this.ctx.beginPath();
+    this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    this.ctx.closePath();
+    this.ctx.fill();
+  }}
+
+
+
+new Snowfall(document.documentElement).render();
+
+	</script>
+
+<div class="modal fade" id="site_offers" role="dialog" >
+    <div class="modal-dialog">
+    
+      <div class="modal-content prl13">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+       
+        <div class="modal-body" style="height: 85vh;">
+       
+        <img   width="100%" height="100%" src="https://Ops1.vnaya.com/assets/images/chrismasOffer.gif"/>
+      </div>
+     
+    </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://ops1.vnaya.com/Ops/public/js/bootstrap.min.js"></script>
+	<script>
+$(document).ready(function() {
+   // $("#site_offers").css('display','block');
+});
+$('body').on('click', '.gif_banner_friday', function(event) {
+
+	$('#site_offers').modal('show');
+});
+</script>
+	<!--------------------------Site Offers pop up start-------------------------------------------------- -->
+
+
+
+
+</body>
+
+</html>
